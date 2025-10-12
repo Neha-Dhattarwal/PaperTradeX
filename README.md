@@ -1,6 +1,6 @@
 # PaperTradeX - Stock Market Paper Trading Web App
 
-A full-featured, mobile-first paper trading web application that allows users to practice stock trading with virtual money using live stock prices from Yahoo Finance.
+A full-featured, paper trading web application that allows users to practice stock trading with virtual money using live stock prices from Yahoo Finance.
 
 ## Features
 
