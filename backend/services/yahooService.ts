@@ -1,54 +1,83 @@
-
 import yahooFinance from 'yahoo-finance2';
 
-export const getHistoricalData = async (symbol: string, startDate: string, endDate: string) => {
+// ===============================
+// Historical Data
+// ===============================
+export const getHistoricalData = async (
+  symbol: string,
+  startDate: string,
+  endDate: string
+) => {
   try {
-    const queryOptions = {
-      period1: startDate, // e.g., '2023-01-01'
-      period2: endDate,   // e.g., '2024-01-01'
-      interval: '1d' as any,
+    const queryOptions: any = {
+      period1: startDate,
+      period2: endDate,
+      interval: '1d',
     };
-    const result = await yahooFinance.historical(symbol, queryOptions);
-    return result.map(item => ({
-      time: item.date.toISOString().split('T')[0],
-      open: item.open,
-      high: item.high,
-      low: item.low,
-      close: item.close,
-      volume: item.volume,
+
+    const result: any = await yahooFinance.historical(symbol, queryOptions);
+
+    if (!result) return [];
+
+    return result.map((item: any) => ({
+      time: item.date ? item.date.toISOString().split('T')[0] : null,
+      open: item.open ?? null,
+      high: item.high ?? null,
+      low: item.low ?? null,
+      close: item.close ?? null,
+      volume: item.volume ?? null,
     }));
+
   } catch (error) {
     console.error(`Yahoo Historical Error for ${symbol}:`, error);
     throw error;
   }
 };
 
+
+// ===============================
+// Live Price
+// ===============================
 export const getLivePrice = async (symbol: string) => {
   try {
-    const quote = await yahooFinance.quote(symbol);
+
+    const quote: any = await yahooFinance.quote(symbol);
+
+    if (!quote) return null;
+
     return {
-      symbol: quote.symbol,
-      price: quote.regularMarketPrice,
-      change: quote.regularMarketChangePercent,
-      bid: quote.bid,
-      ask: quote.ask,
-      lastUpdated: quote.regularMarketTime,
+      symbol: quote.symbol ?? symbol,
+      price: quote.regularMarketPrice ?? 0,
+      change: quote.regularMarketChangePercent ?? 0,
+      bid: quote.bid ?? 0,
+      ask: quote.ask ?? 0,
+      lastUpdated: quote.regularMarketTime ?? null,
     };
+
   } catch (error) {
     console.error(`Yahoo Quote Error for ${symbol}:`, error);
     throw error;
   }
 };
 
+
+// ===============================
+// Search Symbol
+// ===============================
 export const searchSymbol = async (query: string) => {
   try {
-    const result = await yahooFinance.search(query);
-    return result.quotes.map(q => ({
-      symbol: q.symbol,
-      name: q.shortname || q.longname,
-      exchange: q.exchange,
-      type: q.quoteType,
+
+    const result: any = await yahooFinance.search(query);
+
+    if (!result || !result.quotes) return [];
+
+    return result.quotes.map((q: any) => ({
+      symbol: q.symbol ?? "",
+      name: q.shortname || q.longname || "",
+      exchange: q.exchange ?? "",
+      type: q.quoteType ?? "",
     }));
+
   } catch (error) {
     console.error(`Yahoo Search Error for ${query}:`, error);
     throw error;

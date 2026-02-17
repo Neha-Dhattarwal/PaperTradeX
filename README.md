@@ -123,4 +123,4 @@ The frontend uses browser-native ESM. You simply need to serve the root director
 - **CORS**: Configured for secure cross-origin communication between the Frontend and Backend.
 
 ---
-*Developed for professional traders and developers. PaperTradeX is a simulation environment for strategy testing.*
+PaperTradeX is a simulation environment for strategy testing.*
