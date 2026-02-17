@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { MarketMode, Portfolio, OHLC, ReplaySession } from './types';
 import { WATCHLIST, INITIAL_CASH } from './constants';
@@ -22,7 +21,6 @@ const App: React.FC = () => {
   const [watchlistQuotes, setWatchlistQuotes] = useState<Record<string, any>>({});
   const [isSelectingStart, setIsSelectingStart] = useState(false);
 
-  // Moved replay state declaration up to fix block-scoped variable usage errors
   const [replay, setReplay] = useState<ReplaySession>({
     id: 'session_' + Date.now(),
     symbol: WATCHLIST[0].symbol,
@@ -32,7 +30,7 @@ const App: React.FC = () => {
   });
 
   const [portfolio, setPortfolio] = useState<Portfolio>(() => {
-    const saved = localStorage.getItem('tp_portfolio_v11');
+    const saved = localStorage.getItem('tp_portfolio_v12');
     return saved ? JSON.parse(saved) : {
       cash: INITIAL_CASH,
       holdings: [],
@@ -42,7 +40,7 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem('tp_portfolio_v11', JSON.stringify(portfolio));
+    localStorage.setItem('tp_portfolio_v12', JSON.stringify(portfolio));
   }, [portfolio]);
 
   const loadMarketData = useCallback(async (symbol: string) => {
@@ -84,13 +82,10 @@ const App: React.FC = () => {
     };
 
     fetchWatchlist();
-    const interval = setInterval(async () => {
+    const interval = setInterval(() => {
       fetchWatchlist();
       if (marketMode === MarketMode.LIVE) {
-        try {
-          const quote = await api.getQuote(selectedSymbol);
-          setLiveQuote(quote);
-        } catch (e) {}
+        api.getQuote(selectedSymbol).then(setLiveQuote).catch(() => {});
       }
     }, 15000); 
     return () => clearInterval(interval);
@@ -112,9 +107,8 @@ const App: React.FC = () => {
   const currencySymbol = useMemo(() => {
     if (liveQuote?.currency === 'USD') return '$';
     if (liveQuote?.currency === 'INR') return '₹';
-    // Logic for other currencies or defaults
-    if (selectedSymbol.includes('.NS') || selectedSymbol.includes('.BO')) return '₹';
-    return liveQuote?.currency || '$';
+    if (selectedSymbol.endsWith('.NS') || selectedSymbol.endsWith('.BO')) return '₹';
+    return '$';
   }, [liveQuote, selectedSymbol]);
 
   const currentPrice = useMemo(() => {
@@ -125,8 +119,8 @@ const App: React.FC = () => {
 
   const totalEquity = useMemo(() => {
     const holdingsVal = portfolio.holdings.reduce((acc, h) => {
-      // In a real app, you'd convert USD holdings to INR for total equity if the base is INR.
-      // For this simulator, we treat the values as "units" relative to the initial 1M cash.
+      // Logic: For cross-currency simplicity in this simulation, we treat units as direct value.
+      // In prod, one would use a conversion rate (USDINR) here.
       const price = h.symbol === selectedSymbol ? currentPrice : h.avgPrice; 
       return acc + (h.quantity * price);
     }, 0);
@@ -186,14 +180,13 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-[#020617] text-slate-200 overflow-hidden">
-      {/* Navbar */}
       <nav className="h-16 border-b border-white/5 glass flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-white text-lg">PT</div>
-            <span className="font-extrabold tracking-tighter text-lg hidden sm:inline">Paper<span className="text-indigo-400">TradeX</span></span>
+            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-white text-lg shadow-lg shadow-indigo-500/20">TP</div>
+            <span className="font-extrabold tracking-tighter text-lg hidden sm:inline">TradePulse <span className="text-indigo-400">PRO</span></span>
           </div>
-          <div className="hidden lg:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-2xl">
+          <div className="hidden lg:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-2xl border border-white/5">
             {['dashboard', 'market', 'portfolio', 'analytics'].map(t => (
               <button key={t} onClick={() => setActiveTab(t as any)} className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>{t}</button>
             ))}
@@ -201,10 +194,10 @@ const App: React.FC = () => {
         </div>
         <div className="flex items-center gap-6">
           <div className="text-right hidden sm:block">
-            <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block">Available Liquidity</span>
-            <span className="text-sm font-black mono text-indigo-400">₹{portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+            <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest block mb-0.5">Sim Capital</span>
+            <span className="text-sm font-black mono text-emerald-400">₹{portfolio.cash.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/20 flex items-center justify-center font-black text-indigo-400 text-xs">TR</div>
+          <div className="w-10 h-10 rounded-2xl bg-slate-800 border border-white/10 flex items-center justify-center font-black text-indigo-400 text-xs hover:border-indigo-500/50 cursor-pointer transition-colors">TR</div>
         </div>
       </nav>
 
@@ -216,7 +209,16 @@ const App: React.FC = () => {
           marketMode={marketMode} 
         />
 
-        <div className="flex-1 overflow-y-auto bg-[#020617]">
+        <div className="flex-1 overflow-y-auto bg-[#020617] relative">
+          {isLoadingData && (
+             <div className="absolute inset-0 z-40 bg-[#020617]/80 backdrop-blur-sm flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Syncing Market Data...</p>
+                </div>
+             </div>
+          )}
+
           {activeTab === 'dashboard' && (
             <Dashboard 
               selectedSymbol={selectedSymbol}
@@ -249,11 +251,6 @@ const App: React.FC = () => {
           )}
         </div>
       </main>
-      
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.2); border-radius: 10px; }
-      `}</style>
     </div>
   );
 };

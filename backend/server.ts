@@ -1,4 +1,3 @@
-
 import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
@@ -22,8 +21,12 @@ const httpServer = createServer(app);
 // Initialize Socket.io
 initSocket(httpServer);
 
-// Middleware
-app.use(cors() as any);
+// Middleware - Setup CORS for production (Vercel)
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*', 
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions) as any);
 app.use(express.json() as any);
 
 // Routes
@@ -33,7 +36,7 @@ app.use('/api/trade', tradeRoutes);
 
 // Basic Route
 app.get('/api/health', (req: Request, res: Response) => {
-  (res as any).json({ status: 'ok', message: 'TradePulse Backend is running' });
+  (res as any).json({ status: 'ok', message: 'TradePulse Backend is running', timestamp: new Date() });
 });
 
 // Error Handling

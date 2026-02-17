@@ -38,6 +38,45 @@ PaperTradeX follows a modern decoupled architecture designed for scalability and
 - **Database**: MongoDB (Mongoose ODM) for persistent storage of user profiles, portfolios, and trade history.
 - **Market Interface**: Yahoo Finance integration with multi-proxy fallback logic to ensure maximum uptime.
 
+
+
+## 🛠️ Local Development
+
+### Step 1: Backend Setup
+1. `cd backend`
+2. `npm install`
+3. Create `.env`:
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_atlas_uri
+   JWT_SECRET=your_secret_key
+   CORS_ORIGIN=http://localhost:3000
+   ```
+4. `npm run dev` (Runs on port 5000)
+
+### Step 2: Frontend Setup
+1. In the root directory, install a local server (e.g., `npx serve .` or use VS Code Live Server).
+2. Ensure `constants.tsx` has `API_BASE_URL` pointing to `http://localhost:5000`.
+
+---
+
+## 🚀 Deployment (Hosting)
+
+### Phase 1: Backend (Render.com)
+1. Connect your GitHub repo to Render.
+2. Select **Web Service**.
+3. **Build Command**: `cd backend && npm install && npm run build`
+4. **Start Command**: `cd backend && npm start`
+5. **Environment Variables**: Add the keys from your local `.env`.
+
+### Phase 2: Frontend (Vercel.com)
+1. Connect GitHub repo to Vercel.
+2. **Framework Preset**: Other (or Vite if you migrate to Vite).
+3. **Output Directory**: `.` (Root)
+4. **Environment Variables**:
+   - `VITE_API_URL`: Your Render Web Service URL (e.g., `https://tradepulse-api.onrender.com`).
+
+---
 ---
 
 ## 🚀 Key Features
