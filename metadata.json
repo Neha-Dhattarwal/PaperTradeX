@@ -1,0 +1,5 @@
+{
+  "name": "PaperTradeX - Advanced Paper Trading",
+  "description": "A comprehensive full-stack paper trading platform featuring real-time market simulation, 2-year historical replay.",
+  "requestFramePermissions": []
+}
