@@ -2,12 +2,14 @@
 
 PaperTradeX is a high-performance, full-stack interactive paper trading environment. It empowers traders to practice strategies using real-time market streaming and a high-fidelity 2-year historical replay engine.
 
+## Live Mode
+![Live Mode](assets/live.png)
+
+## Replay Mode
+![Replay Mode](assets/replay.png)
 
 ## Analysis Feature
 ![Analysis](assets/analysis.png)
-
-## Live Mode
-![Live Mode](assets/live mode.png)
 
 ## Marketplace
 ![Marketplace](assets/marketplace.png)
@@ -15,8 +17,7 @@ PaperTradeX is a high-performance, full-stack interactive paper trading environm
 ## Portfolio
 ![Portfolio](assets/portfolio.png)
 
-## Replay Mode
-![Replay Mode](assets/replay mode.png)
+
 ---
 
 ## 🏛 Production Architecture
