@@ -22,10 +22,11 @@ const Watchlist: React.FC = () => {
     const fetchWatchlistPrices = async () => {
       const newPrices: Record<string, number> = {};
       let anyRealData = false;
-      
+
       for (const stock of STOCKS) {
         try {
-          const res = await fetch(`http://localhost:5000/live-price?symbol=${stock.symbol}`);
+          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+          const res = await fetch(`${baseUrl}/api/market/quote?symbol=${stock.symbol}`);
           if (res.ok) {
             const data = await res.json();
             if (data.price) {
@@ -47,12 +48,12 @@ const Watchlist: React.FC = () => {
       } else {
         setIsDemo(false);
       }
-      
+
       setPrices(newPrices);
     };
-    
+
     fetchWatchlistPrices();
-    const interval = setInterval(fetchWatchlistPrices, 10000); 
+    const interval = setInterval(fetchWatchlistPrices, 10000);
     return () => clearInterval(interval);
   }, [prices]);
 
@@ -66,7 +67,7 @@ const Watchlist: React.FC = () => {
       </div>
       <div className="flex-1 overflow-y-auto">
         {STOCKS.map(stock => (
-          <button 
+          <button
             key={stock.symbol}
             onClick={() => setCurrentSymbol(stock.symbol)}
             className={`w-full flex items-center justify-between p-4 border-b border-slate-800 transition-all text-left ${currentSymbol === stock.symbol ? 'bg-blue-600/10 border-r-2 border-r-blue-500' : 'hover:bg-slate-800/30'}`}

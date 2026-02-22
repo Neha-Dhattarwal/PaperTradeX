@@ -16,7 +16,7 @@ const generateSyntheticData = (count: number, basePrice: number = 150): CandleDa
   const data: CandleData[] = [];
   let current = basePrice;
   const now = new Date();
-  
+
   for (let i = 0; i < count; i++) {
     const open = current;
     const volatility = current * 0.004; // 0.4% volatility per candle
@@ -25,9 +25,9 @@ const generateSyntheticData = (count: number, basePrice: number = 150): CandleDa
     const high = Math.max(open, close) + Math.random() * (volatility * 0.5);
     const low = Math.min(open, close) - Math.random() * (volatility * 0.5);
     const volume = Math.floor(Math.random() * 1000000) + 500000;
-    
+
     const time = new Date(now.getTime() - (count - i) * 60000);
-    
+
     data.push({
       time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       open,
@@ -45,7 +45,7 @@ const generateSyntheticData = (count: number, basePrice: number = 150): CandleDa
 const Dashboard: React.FC<{ onLogout: () => void }> = () => {
   const [activeTab, setActiveTab] = useState('chart');
   const { mode, currentSymbol, replay, setReplay, state, checkTriggers } = useTrading();
-  
+
   const [liveCandles, setLiveCandles] = useState<CandleData[]>([]);
   const [yesterdayCandles, setYesterdayCandles] = useState<CandleData[]>([]);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
@@ -54,21 +54,22 @@ const Dashboard: React.FC<{ onLogout: () => void }> = () => {
   const [showPracticeSelector, setShowPracticeSelector] = useState(false);
   const [isCompareMode, setIsCompareMode] = useState(false);
 
-  const API_BASE = "http://localhost:5000";
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = `${API_BASE}/api/market`;
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
     try {
-      const histRes = await fetch(`${API_BASE}/historical?symbol=${currentSymbol}`);
+      const histRes = await fetch(`${API_URL}/historical?symbol=${currentSymbol}`);
       if (!histRes.ok) throw new Error("Offline");
-      
+
       const histData = await histRes.json();
-      const priceRes = await fetch(`${API_BASE}/live-price?symbol=${currentSymbol}`);
+      const priceRes = await fetch(`${API_URL}/quote?symbol=${currentSymbol}`);
       const priceData = await priceRes.json();
 
       if (Array.isArray(histData)) setLiveCandles(histData);
       if (priceData.price) setCurrentPrice(priceData.price);
-      
+
       const compData = generateSyntheticData(100, (priceData.price || 150) * 0.98);
       setYesterdayCandles(compData);
       setIsDemoMode(false);
@@ -116,7 +117,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = () => {
         });
       } else {
         try {
-          const res = await fetch(`${API_BASE}/live-price?symbol=${currentSymbol}`);
+          const res = await fetch(`${API_URL}/quote?symbol=${currentSymbol}`);
           const data = await res.json();
           if (data.price) {
             setCurrentPrice(data.price);
@@ -184,7 +185,7 @@ const Dashboard: React.FC<{ onLogout: () => void }> = () => {
                 <button onClick={() => setShowPracticeSelector(true)} className="text-[9px] font-black uppercase px-3 py-1 text-white hover:bg-slate-800 rounded transition-all">Replay</button>
                 <button onClick={() => setIsCompareMode(!isCompareMode)} className={`text-[9px] font-black uppercase px-3 py-1 rounded transition-all ${isCompareMode ? 'bg-blue-600 text-white' : 'text-slate-500 hover:text-slate-300'}`}>Compare</button>
               </div>
-              
+
               {isDemoMode && (
                 <div className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded text-[8px] text-blue-400 font-black uppercase tracking-widest flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
@@ -195,14 +196,14 @@ const Dashboard: React.FC<{ onLogout: () => void }> = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center gap-8">
-               <div className="text-right">
-                  <p className="text-[8px] text-slate-500 font-black uppercase tracking-tighter">Net Floating P&L</p>
-                  <p className={`text-xs font-black font-mono ${stats.unrealized >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {loading ? '---' : `₹${stats.unrealized.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                  </p>
-               </div>
+              <div className="text-right">
+                <p className="text-[8px] text-slate-500 font-black uppercase tracking-tighter">Net Floating P&L</p>
+                <p className={`text-xs font-black font-mono ${stats.unrealized >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {loading ? '---' : `₹${stats.unrealized.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -211,29 +212,29 @@ const Dashboard: React.FC<{ onLogout: () => void }> = () => {
             {activeTab === 'chart' ? (
               <div className="flex-1 flex flex-col h-full relative overflow-hidden">
                 <div className="flex-1 min-h-0 bg-[#0b0f19] relative overflow-hidden">
-                  <StockChart 
-                    data={visibleData} 
-                    symbol={currentSymbol} 
-                    comparisonData={yesterdayCandles} 
-                    isCompareMode={isCompareMode} 
+                  <StockChart
+                    data={visibleData}
+                    symbol={currentSymbol}
+                    comparisonData={yesterdayCandles}
+                    isCompareMode={isCompareMode}
                   />
                   {mode === MarketMode.PRACTICE && replay.allCandles.length > 0 && (
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30">
-                      <ReplayControls 
-                        isPlaying={replay.isPlaying} 
-                        onTogglePlay={() => setReplay(p => ({...p, isPlaying: !p.isPlaying}))} 
-                        speed={replay.speed} 
-                        setSpeed={(s) => setReplay(p => ({...p, speed: s}))} 
-                        currentIndex={replay.currentIndex} 
-                        maxIndex={replay.allCandles.length} 
-                        onSeek={(idx) => setReplay(p => ({...p, currentIndex: idx}))} 
+                      <ReplayControls
+                        isPlaying={replay.isPlaying}
+                        onTogglePlay={() => setReplay(p => ({ ...p, isPlaying: !p.isPlaying }))}
+                        speed={replay.speed}
+                        setSpeed={(s) => setReplay(p => ({ ...p, speed: s }))}
+                        currentIndex={replay.currentIndex}
+                        maxIndex={replay.allCandles.length}
+                        onSeek={(idx) => setReplay(p => ({ ...p, currentIndex: idx }))}
                       />
                     </div>
                   )}
                 </div>
-                
+
                 <div className="hidden lg:block h-[220px] border-t border-slate-800 shrink-0 bg-[#0d111c] overflow-hidden">
-                   <Portfolio currentPrice={currentPrice} />
+                  <Portfolio currentPrice={currentPrice} />
                 </div>
               </div>
             ) : activeTab === 'portfolio' ? (

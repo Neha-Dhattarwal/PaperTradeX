@@ -39,7 +39,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [mode, setMode] = useState<MarketMode>(MarketMode.LIVE);
   const [currentSymbol, setCurrentSymbol] = useState('AAPL');
   const [replay, setReplay] = useState<ReplayState>(INITIAL_REPLAY_STATE);
-  
+
   const [state, setState] = useState<UserState>(() => {
     const saved = localStorage.getItem('paperTradeX_v3_state');
     return saved ? JSON.parse(saved) : INITIAL_USER_STATE;
@@ -49,8 +49,9 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const token = localStorage.getItem('token');
     if (!token) return;
 
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      const res = await fetch('http://localhost:5000/user/state', {
+      const res = await fetch(`${baseUrl}/api/user/state`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -91,7 +92,7 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const executeTrade = useCallback(async (symbol: string, type: OrderType, price: number, qty: number, sl?: number, tp?: number) => {
     const token = localStorage.getItem('token');
-    
+
     // Optimistic Local Update
     const totalValue = price * qty;
     if (type === OrderType.BUY && (mode === MarketMode.LIVE ? state.balance : state.practiceBalance) < totalValue) {
@@ -100,16 +101,17 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
     if (token) {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       try {
-        const res = await fetch('http://localhost:5000/trade/execute', {
+        const response = await fetch(`${baseUrl}/api/trade/portfolio`, {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ symbol, type, price, qty, sl, tp, mode })
         });
-        if (res.ok) {
+        if (response.ok) {
           await syncWithBackend();
           return;
         }
@@ -153,8 +155,8 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       return {
         ...prev,
-        [balanceField]: isLive ? 
-          (type === OrderType.BUY ? prev.balance - totalValue : prev.balance + totalValue) : 
+        [balanceField]: isLive ?
+          (type === OrderType.BUY ? prev.balance - totalValue : prev.balance + totalValue) :
           (type === OrderType.BUY ? prev.practiceBalance - totalValue : prev.practiceBalance + totalValue),
         positions: updatedPositions,
         history: [newTrade, ...prev.history]
@@ -176,8 +178,8 @@ export const TradingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [mode, currentSymbol, state.positions, executeTrade]);
 
   return (
-    <TradingContext.Provider value={{ 
-      mode, setMode, state, executeTrade, currentSymbol, setCurrentSymbol, 
+    <TradingContext.Provider value={{
+      mode, setMode, state, executeTrade, currentSymbol, setCurrentSymbol,
       replay, setReplay, startPractice, checkTriggers, syncWithBackend
     }}>
       {children}

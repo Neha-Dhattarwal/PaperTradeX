@@ -7,7 +7,10 @@ import { TradingViewChart } from './components/TradingViewChart';
 import { api } from './services/api';
 
 const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const socket: Socket = io(SOCKET_URL);
+const socket: Socket = io(SOCKET_URL, {
+  withCredentials: true,
+  transports: ['websocket', 'polling']
+});
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'market' | 'portfolio' | 'analytics'>('dashboard');
