@@ -19,6 +19,10 @@ TradePulse Pro is a high-performance, interactive paper trading environment desi
 ### Screenshot 5
 ![Screenshot 5](assets/SS5.png)
 
+
+##LIVE DEMO
+https://paper-trade-x-git-main-neha-dhattarwals-projects.vercel.app/
+
 ## 🚀 Key Features
 
 - **Live Market Mode**: Real-time quote streaming via WebSockets (Socket.io) for global equities and cryptocurrencies.
