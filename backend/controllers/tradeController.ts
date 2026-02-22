@@ -1,9 +1,9 @@
 
 import { Response } from 'express';
-import Trade from '../models/Trade';
-import Portfolio from '../models/Portfolio';
-import User from '../models/User';
-import * as yahooService from '../services/yahooService';
+import Trade from '../models/Trade.js';
+import Portfolio from '../models/Portfolio.js';
+import User from '../models/User.js';
+import * as yahooService from '../services/yahooService.js';
 
 export const executeBuy = async (req: any, res: Response) => {
   try {

@@ -1,7 +1,7 @@
 
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import * as yahooService from '../services/yahooService';
+import * as yahooService from '../services/yahooService.js';
 
 let io: Server;
 const activeSubscriptions = new Map<string, NodeJS.Timeout>();
@@ -20,7 +20,7 @@ export const initSocket = (server: HttpServer): Server => {
     socket.on('subscribe_price', (symbol: string) => {
       socket.join(symbol);
       console.log(`User ${socket.id} subscribed to price: ${symbol}`);
-      
+
       if (!activeSubscriptions.has(symbol)) {
         const interval = setInterval(async () => {
           try {

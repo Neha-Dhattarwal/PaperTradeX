@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { executeBuy, executeSell, getPortfolio, getTradeHistory } from '../controllers/tradeController';
+import { executeBuy, executeSell, getPortfolio, getTradeHistory } from '../controllers/tradeController.js';
 
 const router = express.Router();
 

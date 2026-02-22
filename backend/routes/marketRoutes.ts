@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { searchStocks, getQuote, getHistorical } from '../controllers/marketController';
+import { searchStocks, getQuote, getHistorical } from '../controllers/marketController.js';
 
 const router = express.Router();
 

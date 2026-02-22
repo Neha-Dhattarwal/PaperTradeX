@@ -3,12 +3,12 @@ import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/db';
-import { initSocket } from './config/socket';
-import { errorHandler } from './middleware/error';
-import authRoutes from './routes/authRoutes';
-import marketRoutes from './routes/marketRoutes';
-import tradeRoutes from './routes/tradeRoutes';
+import connectDB from './config/db.js';
+import { initSocket } from './config/socket.js';
+import { errorHandler } from './middleware/error.js';
+import authRoutes from './routes/authRoutes.js';
+import marketRoutes from './routes/marketRoutes.js';
+import tradeRoutes from './routes/tradeRoutes.js';
 
 // Load environment variables
 dotenv.config();

@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import * as yahooService from '../services/yahooService';
+import * as yahooService from '../services/yahooService.js';
 
 export const searchStocks = async (req: Request, res: Response) => {
   try {
@@ -31,11 +31,11 @@ export const getHistorical = async (req: Request, res: Response) => {
     // Fix: Cast req to any to resolve property access errors on Request type
     const { symbol, start, end } = (req as any).query;
     if (!symbol) return (res as any).status(400).json({ message: 'Symbol required' });
-    
+
     // Default to last 2 years if not provided
     const endDate = end ? (end as string) : new Date().toISOString().split('T')[0];
     const startDate = start ? (start as string) : new Date(new Date().setFullYear(new Date().getFullYear() - 2)).toISOString().split('T')[0];
-    
+
     const data = await yahooService.getHistoricalData(symbol as string, startDate, endDate);
     (res as any).json(data);
   } catch (error: any) {
