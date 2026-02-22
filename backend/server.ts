@@ -3,18 +3,13 @@ import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/db.js';
 import { initSocket } from './config/socket.js';
 import { errorHandler } from './middleware/error.js';
-import authRoutes from './routes/authRoutes.js';
 import marketRoutes from './routes/marketRoutes.js';
 import tradeRoutes from './routes/tradeRoutes.js';
 
 // Load environment variables
 dotenv.config();
-
-// Connect to MongoDB
-connectDB();
 
 const app = express();
 const httpServer = createServer(app);
@@ -23,26 +18,10 @@ const httpServer = createServer(app);
 initSocket(httpServer);
 
 // Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  process.env.FRONTEND_URL
-].filter(Boolean) as string[];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}) as any);
-
+app.use(cors() as any);
 app.use(express.json() as any);
 
 // Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/trade', tradeRoutes);
 

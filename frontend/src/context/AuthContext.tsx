@@ -17,32 +17,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; onLogout: () =>
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setAuthState({
-        isAuthenticated: true,
-        user: JSON.parse(savedUser),
-      });
-    }
+    // Force bypass authentication for simulation
+    setAuthState({
+      isAuthenticated: true,
+      user: { id: 'guest_user_123', name: 'Guest Trader', email: 'guest@example.com', cashBalance: 100000 },
+    });
   }, []);
 
   const login = (token: string, userData: any) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setAuthState({
-      isAuthenticated: true,
-      user: userData,
-    });
+    // No-op for guest mode
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-    });
-    onLogout();
+    // No-op for guest mode
   };
 
   return (
