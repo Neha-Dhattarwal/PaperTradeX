@@ -239,8 +239,8 @@ const App: React.FC = () => {
       <nav className="h-16 border-b border-white/5 glass flex items-center justify-between px-6 shrink-0 z-50">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-white text-lg">TP</div>
-            <span className="font-extrabold tracking-tighter text-lg hidden sm:inline">TradePulse <span className="text-indigo-400">PRO</span></span>
+            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center font-black text-white text-lg">PT</div>
+            <span className="font-extrabold tracking-tighter text-lg hidden sm:inline">PaperTrade <span className="text-indigo-400">X</span></span>
           </div>
           <div className="hidden lg:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-2xl">
             {['dashboard', 'market', 'portfolio', 'analytics'].map(t => (
