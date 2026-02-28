@@ -1,4 +1,4 @@
-# TradePulse Pro | Advanced Paper Trading Platform
+# PaperTradeX| Advanced Paper Trading Platform
 
 TradePulse Pro is a high-performance, interactive paper trading environment designed for traders to master strategies using real-time market data and historical price action. Built with a professional, production-level architecture for high-speed execution and seamless deployment.
 
