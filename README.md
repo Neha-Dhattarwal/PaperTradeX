@@ -2,6 +2,10 @@
 
 TradePulse Pro is a high-performance, interactive paper trading environment designed for traders to master strategies using real-time market data and historical price action. Built with a professional, production-level architecture for high-speed execution and seamless deployment.
 
+##Lve Demo Video Link 
+
+https://drive.google.com/file/d/1Cgy8U89fiakq9NSpCRwQCj3kIsS_P-Mj/view?usp=sharing
+
 ## 📸 Screenshots
 
 ### Screenshot 1
